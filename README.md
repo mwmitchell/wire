@@ -120,8 +120,8 @@ The dispatching in Wire is done in two steps.
 
 First, a suitable route is identified by asking the following questions:
 
-  * do all of the pre-conditions return true?
   * does the request method match?
+  * do all of the pre-conditions return true?
   * does the route path match?
 
 If a route is not matched, then Wire applies these same rules to the next route in the sequence. If a route is matched, it's injected into the request map.

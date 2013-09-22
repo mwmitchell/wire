@@ -23,8 +23,8 @@
 
 (defn dispatch [route-defs request & [pre-mapping handler-mapping]]
   (when-let [[{handler :handler :as route} path-info]
-             (some #(and (pre-match? % request pre-mapping)
-                         (method-matches? (:method %) request)
+             (some #(and (method-matches? (:method %) request)
+                         (pre-match? % request pre-mapping)
                          (path-matches? % request)) route-defs)]
     [(assoc route :handler-fn (get handler-mapping handler handler))
      path-info]))
