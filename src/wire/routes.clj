@@ -6,14 +6,12 @@
 (def ^:dynamic *context* {})
 
 (defn- get-path [x]
-  (if (vector? x)
-    (first x)
-    x))
+  (when (vector? x)
+    (first x)))
 
 (defn- get-rules [x]
-  (if (and (vector? x) (seq (rest x)))
-    (apply hash-map (rest x))
-    {}))
+  (when (and (vector? x) (seq (rest x)))
+    (apply hash-map (rest x))))
 
 (defn- parse-context-args
   [arg]
