@@ -87,7 +87,7 @@ Here's a small example:
 
 The result of which is a single-level vector of route map definitions:
 ```clojure
-[{:path "/admin/dashboard" :handler [render-admin-dashboard] ...}
+[{:path "/admin/dashboard" :handler render-admin-dashboard ...}
  {:path "/:page.html" :rules {:page #".+"} ...}]
 ```
 
