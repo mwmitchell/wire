@@ -43,7 +43,7 @@
 
 (defn- mk-route-def
   [method & args]
-  (assoc (merge-context (parse-route-args args))
+  (assoc (merge-context *context* (parse-route-args args))
     :method method))
 
 (defn GET [& args]
@@ -65,8 +65,8 @@
   (apply mk-route-def nil args))
 
 (defn context [spec & routes]
-  (binding [*context* (merge-context (parse-context-args spec))]
-    (mapv merge-context (flatten routes))))
+  (binding [*context* (merge-context *context* (parse-context-args spec))]
+    (mapv #(merge-context *context* %) (flatten routes))))
 
 (defn compile-route [route]
   {:pre [(map? route) (string? (:path route))]}
