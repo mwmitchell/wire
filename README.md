@@ -43,7 +43,33 @@ To match a compiled route and execute it:
 
 ### Helpers
 
-Wire provides a few helpers for building routes. The helpers include *functions* for building routes based off of a request method and for adding context. Here's a small example:
+Wire provides a few helpers for building routes. The helpers include *functions* for building routes based off of a request method and for adding context.
+
+#### Arguments
+
+An argument to `context` or any of the method helpers (GET,POST etc.) can take on a few forms:
+
+```clojure
+(defn my-handler [request])
+
+;; string
+(GET "/" my-handler)
+{:method :get, :path "/", :handler my-handler}
+
+;; keyword
+(GET :root handler)
+{:method :get, :name :root, :handler my-handler}
+
+;; vector
+(GET ["/:id" :id #"[0-9]+"] my-handler)
+{:method :get, :rules {:id #"[0-9]+"}, :path "/:id", :handler my-handler}
+
+;; map
+(GET {:name :xyz :path ["/:id" :id #"[0-9]+"]} my-handler)
+{:method :get, :name :xyz, :path "/:id", :rules {:id #"[0-9]+"}, :handler my-handler}
+```
+
+Here's a small example:
 
 ```clojure
 (def app-routes
