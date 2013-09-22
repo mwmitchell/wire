@@ -37,7 +37,7 @@ Compiling the route simply adds a new key to the map called :matcher, which is a
 To match a compiled route and execute it:
 
 ```clojure
-(let [[path-params matched-route] (wire.dispatch/dispatch [my-route] request)]
+(let [[matched-route path-params] (wire.dispatch/dispatch [my-route] request)]
   ((:handler matched-route) (assoc request :path-params path-params)))
 ```
 
