@@ -44,23 +44,13 @@
   (assoc (merge-context *context* (parse-route-args args))
     :method method))
 
-(defn GET [& args]
-  (apply mk-route :get args))
+(defmacro ^:private mk-method-route-fn [n m]
+  `(defn ~n [& args#] (apply mk-route ~m args#)))
 
-(defn PUT [& args]
-  (apply mk-route :put args))
+(doseq [n [:get :post :put :delete :patch :head :options :trace :connect]]
+  (eval `(mk-method-route-fn ~(-> n name s/upper-case symbol) ~n)))
 
-(defn POST [& args]
-  (apply mk-route :post args))
-
-(defn DELETE [& args]
-  (apply mk-route :delete args))
-
-(defn PATCH [& args]
-  (apply mk-route :patch args))
-
-(defn ANY [& args]
-  (apply mk-route nil args))
+(mk-method-route-fn ANY nil)
 
 (defn context [spec & routes]
   (binding [*context* (merge-context *context* (parse-context-args spec))]
