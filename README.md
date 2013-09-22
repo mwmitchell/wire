@@ -10,7 +10,7 @@ The goals of Wire are:
   * path generation
   * simple *function* helpers
   * support standard Ring interface
-  * separate identification of route and execution of matched handler
+  * separate identification-of route and execution-of matched handler
 
 ## Usage
 
@@ -43,7 +43,7 @@ To match a compiled route and execute it:
 
 ### Helpers
 
-Wire provides a few helpers for building routes. The helpers include *functions* for buliding routes based off of a request method and for adding context. Here's a small example:
+Wire provides a few helpers for building routes. The helpers include *functions* for building routes based off of a request method and for adding context. Here's a small example:
 
 ```clojure
 (def app-routes
@@ -91,17 +91,17 @@ The dispatching in Wire is done in two steps.
 
 ##### Route identification
 
-First, a suitable route definition is identified by asking the following questions:
+First, a suitable route is identified by asking the following questions:
 
   * do all of the pre-conditions return true?
   * does the request method match?
   * does the route path match?
 
-If a route is matched, it's injected into the request map.
+If a route is not matched, then Wire applies these same rules to the next route in the sequence. If a route is matched, it's injected into the request map.
 
 ##### Handler execution
 
-At the end of the stack is yet another piece of middleware for handling the execution of this route called exec-matched-route.
+At the end of the stack is middleware for handling the execution of the matched route's handler function.
 
 Here's the basic skeleton:
 
