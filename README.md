@@ -2,6 +2,16 @@
 
 Simple routing for Ring.
 
+The goals of Wire are:
+
+  * use data to describes routes (not wrapped functions)
+  * route contexts
+  * route metadata (they're just maps)
+  * path generation
+  * simple *function* helpers
+  * support standard Ring interface
+  * separate identification of route and execution of matched handler
+
 ## Usage
 
 Route definitions are maps:
