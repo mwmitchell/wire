@@ -16,10 +16,10 @@
 (defn- parse-context-args
   [arg]
   (cond
-   (string? arg) {:path arg :rules {}}
+   (string? arg) {:path arg}
    (vector? arg) {:path (get-path arg) :rules (get-rules arg)}
-   (map? arg) (merge arg (parse-context-args (:path arg)))
    (keyword? arg) {:name arg}
+   (map? arg) (merge arg (parse-context-args (:path arg)))
    :else nil))
 
 (defn- parse-route-args [args]
