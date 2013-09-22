@@ -17,12 +17,10 @@
    Optionally accepts a mapping for :pre and :handler function resolution."
   [h routes & [pre-mapping handler-mapping]]
   (fn [r]
-    (when-let [match (dispatch routes r pre-mapping)]
-      (let [[{:keys [handler] :as route-def} path-params] match
-            route-def-with-handler-fn
-            (assoc route-def :handler-fn (get handler-mapping handler handler))]
+    (when-let [match (dispatch routes r pre-mapping handler-mapping)]
+      (let [[route path-params] match]
         (h (-> r
-               (assoc-in [match-id] route-def-with-handler-fn)
+               (assoc-in [match-id] route)
                (update-in [:params] merge path-params)
                (assoc-in [:route-params] path-params)))))))
 
