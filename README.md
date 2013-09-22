@@ -50,8 +50,10 @@ Wire provides a few helpers for building routes. The helpers include *functions*
 ```
 
 The result of which is a single-level vector of route map definitions:
+```clojure
 [{:path "/admin/dashboard" :handler [render-admin-dashboard] ...}
  {:path "/:page.html" :rules {:page #".+"} ...}]
+```
 
 Notice that the routes have carried the context so that the path contains the prefix. The route helpers will concatenate the :path, :rules and any :pre functions of the context. Subsequent context calls will continue this process so that context is always concatenated or passed through. 
 
