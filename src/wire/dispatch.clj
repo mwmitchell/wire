@@ -10,14 +10,25 @@
           (= (s/upper-case (name form-method)) (s/upper-case (name method)))
           (= method r-method)))))
 
-(defn pre-match? [route-def request]
-  (every? (fn [f] (f request)) (:pre route-def)))
+;; TODO: document this:
+;; Optionally provide the pre functions in a map:
+;; (pre-match?
+;;  {:path "/" :pre ['https?]}
+;;  {:request-method :http}
+;;  {'https? (fn [r] (= (:request-method r) :https))})
+
+(defn pre-match? [route-def request mapping]
+  (every? (fn [pre]
+            (if-let [f (pre mapping)]
+              (f request)
+              (pre request)))
+          (:pre route-def)))
 
 (defn match-route [route-def request]
   (when-let [params (clout/route-matches (:matcher route-def) request)]
-    [route-def params]) )
+    [route-def params]))
 
-(defn dispatch [route-defs request]
-  (some #(and (pre-match? % request)
+(defn dispatch [route-defs request & [pre-mapping]]
+  (some #(and (pre-match? % request pre-mapping)
               (method-matches? (:method %) request)
               (match-route % request)) route-defs))

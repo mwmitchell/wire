@@ -23,7 +23,7 @@
    :else nil))
 
 (defn- parse-route-args [args]
-  {:pre [(fn? (last args))]}
+  {:pre [(or (ifn? (last args)) (symbol? (last args)))]}
   (assoc (parse-context-args (first args))
     :handler (last args)))
 

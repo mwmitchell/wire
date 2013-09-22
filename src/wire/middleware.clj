@@ -9,18 +9,20 @@
    This executes the matched route handler"
   [r]
   (when (match-id r)
-    ((-> r match-id :handler)
-     (dissoc r match-id))))
+    ((-> r match-id :handler-fn) (dissoc r match-id))))
 
 (defn wrap-match
   "Injects the matched route and its path params into the request,
-   then calls the next handler"
-  [h routes]
+   then calls the next handler.
+   Optionally accepts a mapping for :pre and :handler function resolution."
+  [h routes & [pre-mapping handler-mapping]]
   (fn [r]
-    (when-let [match (dispatch routes r)]
-      (let [[route-def path-params] match]
+    (when-let [match (dispatch routes r pre-mapping)]
+      (let [[{:keys [handler] :as route-def} path-params] match
+            route-def-with-handler-fn
+            (assoc route-def :handler-fn (get handler-mapping handler handler))]
         (h (-> r
-               (assoc-in [match-id] route-def)
+               (assoc-in [match-id] route-def-with-handler-fn)
                (update-in [:params] merge path-params)
                (assoc-in [:route-params] path-params)))))))
 
