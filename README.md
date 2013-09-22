@@ -73,7 +73,7 @@ All other context keys are passed through, but the route defs override anything 
 Routes can contain a :name key. The route example above contains a route with a name, :root. This name can be used later for finding a route, and building a path according to its path signature. Wire provides a helper for building paths:
 
 ```clojure
-(path-for :admin-stats {:view "overview"})
+(path-for app-routes :admin-stats {:view "overview"})
 ;; "/admin/stats/overview"
 ```
 
