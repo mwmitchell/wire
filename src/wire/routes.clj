@@ -3,6 +3,8 @@
             [clojure.set :as set]
             [clout.core :as clout]))
 
+(defrecord Route [name path rules method pre handler handler-fn ])
+
 (def ^:dynamic *context* {})
 
 (defn- get-path [x]

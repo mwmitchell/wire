@@ -26,13 +26,13 @@ Route definitions are maps:
    :pre [pre-dispatch-predicates ...]})
 ```
 
-A route can be compiled:
+A route's path/rules must be compiled:
 
 ```clojure
 (wire.routes/compile-route my-route)
 ```
 
-Compiling the route simply adds a new key to the map called :matcher, which is a compiled Clout Route.
+Compiling the route path simply adds a new key to the map called :matcher, which is a compiled Clout Route.
 
 To match a compiled route and execute it:
 
