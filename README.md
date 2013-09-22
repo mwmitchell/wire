@@ -77,7 +77,7 @@ Here's a small example:
     (GET my-handler)
     (GET "contact" render-contact)
     (GET [":page.html" :page #".+"] render-page)
-    (context {:path "/admin" :pre [https? (host-is? "blerg.com")]}
+    (context {:path "admin" :pre [https? (host-is? "blerg.com")]}
       (GET "dashboard" render-admin-dashboard)
       (GET {:name :admin-stats
             :path "stats/:view"
