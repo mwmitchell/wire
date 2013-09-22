@@ -39,28 +39,28 @@
      old
      new)))
 
-(defn- mk-route-def
+(defn mk-route
   [method & args]
   (assoc (merge-context *context* (parse-route-args args))
     :method method))
 
 (defn GET [& args]
-  (apply mk-route-def :get args))
+  (apply mk-route :get args))
 
 (defn PUT [& args]
-  (apply mk-route-def :put args))
+  (apply mk-route :put args))
 
 (defn POST [& args]
-  (apply mk-route-def :post args))
+  (apply mk-route :post args))
 
 (defn DELETE [& args]
-  (apply mk-route-def :delete args))
+  (apply mk-route :delete args))
 
 (defn PATCH [& args]
-  (apply mk-route-def :patch args))
+  (apply mk-route :patch args))
 
 (defn ANY [& args]
-  (apply mk-route-def nil args))
+  (apply mk-route nil args))
 
 (defn context [spec & routes]
   (binding [*context* (merge-context *context* (parse-context-args spec))]
