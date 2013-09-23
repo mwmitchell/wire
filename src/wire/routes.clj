@@ -5,19 +5,11 @@
 
 (def ^:dynamic *context* {})
 
-(defn- get-path [x]
-  (when (vector? x)
-    (first x)))
-
-(defn- get-rules [x]
-  (when (and (vector? x) (seq (rest x)))
-    (apply hash-map (rest x))))
-
 (defn- parse-context-args
   [arg]
   (cond
    (string? arg) {:path arg}
-   (vector? arg) {:path (get-path arg) :rules (get-rules arg)}
+   (vector? arg) {:path (first arg) :rules (apply hash-map (rest arg))}
    (keyword? arg) {:name arg}
    (map? arg) (merge arg (parse-context-args (:path arg)))
    :else nil))
