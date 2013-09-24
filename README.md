@@ -20,7 +20,7 @@ Route definitions are maps:
 (def my-route
   {:path "/:id"
    :rules {:id #"[0-9]+"}
-   :name :item
+   :id :item
    :method :get
    :handler (fn [request])
    :pre [pre-dispatch-predicates ...]})
@@ -58,15 +58,15 @@ An argument to `context` or any of the method helpers (GET,POST etc.) can take o
 
 ;; keyword
 (GET :root handler)
-{:method :get, :name :root, :handler my-handler}
+{:method :get, :id :root, :handler my-handler}
 
 ;; vector
 (GET ["/:id" :id #"[0-9]+"] my-handler)
 {:method :get, :rules {:id #"[0-9]+"}, :path "/:id", :handler my-handler}
 
 ;; map
-(GET {:name :xyz :path ["/:id" :id #"[0-9]+"]} my-handler)
-{:method :get, :name :xyz, :path "/:id", :rules {:id #"[0-9]+"}, :handler my-handler}
+(GET {:id :xyz :path ["/:id" :id #"[0-9]+"]} my-handler)
+{:method :get, :id :xyz, :path "/:id", :rules {:id #"[0-9]+"}, :handler my-handler}
 ```
 
 Here's a small example:
@@ -79,7 +79,7 @@ Here's a small example:
     (GET [":page.html" :page #".+"] render-page)
     (context {:path "admin" :pre [https? (host-is? "blerg.com")]}
       (GET "dashboard" render-admin-dashboard)
-      (GET {:name :admin-stats
+      (GET {:id :admin-stats
             :path "stats/:view"
             :rules {:view #".+"}
             :handler view-stats}))))
@@ -96,8 +96,8 @@ Notice that the routes have carried the context so that the path contains the pr
 
 All other context keys are passed through, but the route defs override anything else when a value is present.
 
-#### Names and path generation
-Routes can contain a :name key. The route example above contains a route with a name, :root. This name can be used later for finding a route, and building a path according to its path signature. Wire provides a helper for building paths:
+#### IDs and path generation
+Routes can contain a :id key. The route example above contains a route with a id, :root. This id can be used later for finding a route, and building a path according to its path signature. Wire provides a helper for building paths:
 
 ```clojure
 (path-for app-routes :admin-stats {:view "overview"})

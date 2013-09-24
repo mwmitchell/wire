@@ -10,7 +10,7 @@
   (cond
    (string? arg) {:path arg}
    (vector? arg) {:path (first arg) :rules (apply hash-map (rest arg))}
-   (keyword? arg) {:name arg}
+   (keyword? arg) {:id arg}
    (map? arg) (merge arg (parse-context-args (:path arg)))
    :else nil))
 
