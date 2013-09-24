@@ -74,7 +74,7 @@ Here's a small example:
 ```clojure
 (def app-routes
   (context "/"
-    (GET my-handler)
+    (GET :root my-handler)
     (GET "contact" render-contact)
     (GET [":page.html" :page #".+"] render-page)
     (context {:path "admin" :pre [https? (host-is? "blerg.com")]}
@@ -97,11 +97,14 @@ Notice that the routes have carried the context so that the path contains the pr
 All other context keys are passed through, but the route defs override anything else when a value is present.
 
 #### IDs and path generation
-Routes can contain a :id key. The route example above contains a route with a id, :root. This id can be used later for finding a route, and building a path according to its path signature. Wire provides a helper for building paths:
+Routes can contain an :id key. The route example above contains a route with an :id of :root. This ID can be used later for finding a route, and building a path according to its path signature. Wire provides a helper for building paths:
 
 ```clojure
+(find-route-def-by-id app-routes :root)
+{:id :root :path "/" ...}
+
 (path-for app-routes :admin-stats {:view "overview"})
-;; "/admin/stats/overview"
+"/admin/stats/overview"
 ```
 
 ### Middleware
