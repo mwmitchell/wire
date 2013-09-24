@@ -14,6 +14,10 @@ The goals of Wire are:
 
 ## Usage
 
+### Leiningen project.clj
+
+Just a SNAPSHOT for now: [com.codesignals/wire "0.1.0-SNAPSHOT"]
+
 Route definitions are maps:
 
 ```clojure
