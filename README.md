@@ -145,21 +145,6 @@ Here's the basic skeleton:
       (middle/wrap-match compiled-app-routes)))
 ```
 
-## Delayed :pre and :handler resolution
-
-It's possible to model routes without injecting functions, and instead map their :handler and :pre values to something at request-time. Here's an example:
-
-```clojure
-(def my-routes
-  (context {:path "/" :pre [:https?]}
-    (GET :render-root)))
-
-(middleware/wrap-match
-  my-routes
-  {:https? (fn [r] (= :https (:request-method r)))}
-  {:render-root (fn [r] {:body "root"})})
-```
-
 ## License
 
 Copyright © 2013 Matt Mitchell

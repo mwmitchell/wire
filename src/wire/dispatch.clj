@@ -2,12 +2,8 @@
   (:require [clout.core :as clout]
             [clojure.string :as s]))
 
-(defn pre-match? [route-def request mapping]
-  (every? (fn [pre]
-            (if-let [f (pre mapping)]
-              (f request)
-              (pre request)))
-          (:pre route-def)))
+(defn pre-match? [{fns :pre} request]
+  (every? (fn [f] (f request)) fns))
 
 (defn- method-matches? [method request]
   (or (nil? method)
@@ -17,14 +13,15 @@
           (= (s/upper-case (name form-method)) (s/upper-case (name method)))
           (= method r-method)))))
 
-(defn path-matches? [route-def request]
-  (when-let [params (clout/route-matches (:matcher route-def) request)]
+(defn path-matches? [{matcher :matcher :as route-def} request]
+  {:pre [(not (nil? matcher))]}
+  (when-let [params (clout/route-matches matcher request)]
     [route-def params]))
 
-(defn dispatch [route-defs request & [pre-mapping handler-mapping]]
+(defn dispatch [route-defs request]
+  {:pre [(sequential? route-defs)]}
   (when-let [[{handler :handler :as route} path-info]
              (some #(and (method-matches? (:method %) request)
-                         (pre-match? % request pre-mapping)
+                         (pre-match? % request)
                          (path-matches? % request)) route-defs)]
-    [(assoc route :handler-fn (get handler-mapping handler handler))
-     path-info]))
+    [route path-info]))
