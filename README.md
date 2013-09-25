@@ -4,19 +4,18 @@ Simple routing for Ring.
 
 The goals of Wire are:
 
-  * use data to describes routes (not wrapped functions)
-  * route contexts
-  * route metadata (they're just maps)
+  * use data to represent routes (not wrapped functions)
+  * route context/metadata support
   * path generation
-  * simple *function* helpers
+  * simple helpers
   * support standard Ring interface
   * separate identification-of route and execution-of matched handler
 
-## Usage
-
-### Leiningen project.clj
+## Leiningen project.clj
 
 Just a SNAPSHOT for now: [com.codesignals/wire "0.1.0-SNAPSHOT"]
+
+## Usage
 
 Route definitions are maps:
 
@@ -47,7 +46,7 @@ To match a compiled route and execute it:
 
 ### Helpers
 
-Wire provides a few helpers for building routes. The helpers include *functions* for building routes based off of a request method and for adding context.
+Wire provides a few helpers for building routes. The helpers include functions for building routes based off of a request method and for adding context.
 
 #### Arguments
 
@@ -131,7 +130,7 @@ First, a suitable route is identified by asking the following questions:
   * do all of the pre-conditions return true?
   * does the route path match?
 
-If a route is not matched, then Wire applies these same rules to the next route in the sequence. If a route is matched, it's injected into the request map.
+If a route is not matched, then Wire applies these same rules to the next route in the sequence. If a route is matched, it's injected into the request map as :matched-route.
 
 ##### Handler execution
 
@@ -142,6 +141,7 @@ Here's the basic skeleton:
 ```clojure
 (def my-ring-app
   (-> middle/exec-matched-route
+      ;; add your own middleware here...
       (middle/wrap-match compiled-app-routes)))
 ```
 
