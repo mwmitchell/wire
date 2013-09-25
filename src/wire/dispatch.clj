@@ -20,8 +20,6 @@
 
 (defn dispatch [route-defs request]
   {:pre [(sequential? route-defs)]}
-  (when-let [[{handler :handler :as route} path-info]
-             (some #(and (method-matches? (:method %) request)
-                         (pre-match? % request)
-                         (path-matches? % request)) route-defs)]
-    [route path-info]))
+  (some #(and (method-matches? (:method %) request)
+              (pre-match? % request)
+              (path-matches? % request)) route-defs))
