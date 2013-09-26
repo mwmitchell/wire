@@ -1,6 +1,5 @@
 (ns wire.routes
   (:require [clojure.string :as s]
-            [clojure.set :as set]
             [clout.core :as clout]))
 
 (def ^:dynamic *context* {})
@@ -44,18 +43,22 @@
 
 (mk-method-route-fn ANY nil)
 
-(defn context [spec & routes]
-  (binding [*context* (merge-context *context* (parse-context-args spec))]
+(defn context [base & routes]
+  (binding [*context* (merge-context *context* (parse-context-args base))]
     (mapv #(merge-context *context* %) (flatten routes))))
 
 (defn compile-route [route]
   {:pre [(map? route) (string? (:path route))]}
-  (assoc route :matcher (clout/route-compile
-                         (:path route)
-                         (or (:rules route) {}))))
+  (merge route {:path-fn (clout/route-compile
+                          (:path route)
+                          (or (:rules route) {}))
+                :pre-fn (if (seq (:pre route))
+                          (fn [r] (every? #(% r) (:pre route)))
+                          (fn [_]))}))
 
 (defn compile-routes
-  "Concatenates/compiles the route-defs and sorts by the longest (most specific) :path first"
+  "Concatenates/compiles the route maps,
+   then sorts by the longest (most specific) :path first"
   [& route-defs]
   (map compile-route
        (sort-by #(count (:path %)) > (apply concat route-defs))))
