@@ -18,5 +18,5 @@
 (defn dispatch [route-defs request]
   {:pre [(sequential? route-defs)]}
   (some #(and (method-matches? (:method %) request)
-              (:pre-fn request)
+              ((:pre-fn %) request)
               (path-matches? % request)) route-defs))
