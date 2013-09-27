@@ -1,4 +1,4 @@
-(defproject com.codesignals/wire "0.1.0-SNAPSHOT"
+(defproject com.codesignals/wire "0.1.1-SNAPSHOT"
   :description "A routing lib for Clojure and Ring"
   :url "http://github.com/mwmitchell/wire"
   :license {:name "Eclipse Public License"
