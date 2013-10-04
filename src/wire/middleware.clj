@@ -19,10 +19,9 @@
   (let [compiled-routes (compile/compile-route routes)]
     (fn [request]
       (when-let [match (some #(% request) compiled-routes)]
-        (let [match (assoc-in match [:handler] (get-in (:route match) [:methods (:method match)]))]
-          (h (-> request
-                 (assoc-in [match-id] match)
-                 (update-in [:params] merge (:params match)))))) )))
+        (h (-> request
+               (assoc-in [match-id] match)
+               (update-in [:params] merge (:params match))))) )))
 
 (defn wrap-not-found
   "Renders a 404 if a matched route was not found"

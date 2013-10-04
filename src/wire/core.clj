@@ -11,10 +11,10 @@
     [in]
     (cond
      (map? in) in
-     (keyword? in) {:id in :path (name in)}
-     (coll? in) (let [id (find-by keyword? in)]
-                  {:id id
-                   :path (or (find-by string? in) (when id (name id)))
+     (keyword? in) {:name in :path (name in)}
+     (coll? in) (let [rname (find-by keyword? in)]
+                  {:name rname
+                   :path (or (find-by string? in) (when rname (name rname)))
                    :rules (find-by map? in)
                    :pre (find-by vector? in)})
      :else {})))
@@ -35,7 +35,7 @@
     (parse-opts (first opts))))
 
 (defn- base-route [parsed-opts & data]
-  {:pre [(contains? parsed-opts :id)]}
+  {:pre [(contains? parsed-opts :name)]}
   (-> parsed-opts
       (assoc :methods (apply merge (filter method? data)))
       (assoc :routes (filter route? data))
@@ -43,7 +43,7 @@
 
 (defn root [& data]
   (let [opts (fetch-opts data)]
-    (apply base-route (merge {:path "" :id nil} opts) data)))
+    (apply base-route (merge {:path "" :name nil} opts) data)))
 
 (defn route [& data]
   (let [opts (fetch-opts data)]

@@ -1,5 +1,5 @@
 (ns wire.path
-  (:require [wire.navigation :refer [collect-routes]]
+  (:require [wire.navigation :refer [collect-routes collect-by-id]]
             [clojure.set :refer [difference]]
             [clojure.string :as s]))
 
@@ -18,9 +18,16 @@
   "Creates a param populated path suitable for use in an URL.
    Example:
    (route-path root-route [:child :node] {:param 100})"
-  [root ids path-values]
+  [root names path-values]
   (replace-params
-   (->> (collect-routes root ids)
+   (->> (collect-routes root names)
+        (map :path)
+        (s/join "/"))
+   path-values))
+
+(defn route-path-by-id [route id path-values]
+  (replace-params
+   (->> (collect-by-id route id)
         (map :path)
         (s/join "/"))
    path-values))
