@@ -9,12 +9,14 @@
 
 (defn action-fn [{route-context :route-context}]
   (let [routes (n/collect-routes app-routes (:ids route-context))]
-    {:matched-method (:method route-context)
-     :ids (:ids route-context)
-     :full-route-path (s/join "/" (map :path routes))
-     :url (p/route-path app-routes (:ids route-context) (:params route-context))
-     :parent-url (p/route-path app-routes (n/up (:ids route-context) 1) (:params route-context))
-     :params (get-in route-context [:params])}))
+    (merge
+     (dissoc route-context :route)
+     {:matched-method (:method route-context)
+      :names (:names route-context)
+      :full-route-path (s/join "/" (map :path routes))
+      :url (p/route-path app-routes (:names route-context) (:params route-context))
+      :parent-url (p/route-path app-routes (n/up (:names route-context) 1) (:params route-context))
+      :params (get-in route-context [:params])})))
 
 (def app-routes
   (root

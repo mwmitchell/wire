@@ -10,11 +10,12 @@
       r-method)))
 
 (defn compile-route [route & [parents]]
-  (let [parent-ids (vec (keep :id parents))
+  (let [parent-names (vec (keep :name parents))
         rules (or (merge
                    (apply merge (map :rules parents))
                    (:rules route)) {})
-        ids (vec (keep identity (conj parent-ids (:id route))))
+        names (vec (keep identity (conj parent-names (:name route))))
+        _ (prn names)
         full-path (str (s/join "/" (map :path parents)) "/" (:path route))
         path-matcher (clout/route-compile full-path (or rules {}))
         matcher (fn [r]
@@ -23,9 +24,11 @@
                                       (and (contains? (:methods route) :any) :any))]
                       (when-let [path-params (clout/route-matches path-matcher r)]
                         {:route route
+                         :handler (get-in route [:methods mm])
                          :method mm
                          :params path-params
-                         :ids ids}))))]
+                         :full-path full-path
+                         :names names}))))]
     (reduce
      (fn [mem r]
        (concat mem (compile-route r (conj (vec parents) route))))
