@@ -8,7 +8,7 @@
 (declare app-routes action-fn)
 
 (defn action-fn [{route-context :route-context}]
-  (let [routes (n/collect-routes app-routes (:ids route-context))]
+  (let [routes (n/collect-routes app-routes (:names route-context))]
     (merge
      (dissoc route-context :route)
      {:matched-method (:method route-context)
