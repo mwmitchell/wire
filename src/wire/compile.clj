@@ -15,7 +15,6 @@
                    (apply merge (map :rules parents))
                    (:rules route)) {})
         names (vec (keep identity (conj parent-names (:name route))))
-        _ (prn names)
         full-path (str (s/join "/" (map :path parents)) "/" (:path route))
         path-matcher (clout/route-compile full-path (or rules {}))
         matcher (fn [r]
