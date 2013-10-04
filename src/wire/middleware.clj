@@ -1,28 +1,28 @@
 (ns wire.middleware
-  (:require [wire.dispatch :refer [dispatch]]))
+  (require [wire.navigation :as nav]
+           [wire.compile :as compile]))
 
 ;; The name of the route-def that's injected into the request map
-(def match-id :matched-route)
+(def match-id :route-context)
 
-(defn exec-matched-route
+(defn wrap-exec-route
   "The last element in the middleware chain.
    This executes the matched route handler"
   [r]
   (when (match-id r)
-    ((-> r match-id :handler) (dissoc r match-id))))
+    ((get-in r [match-id :handler]) r)))
 
-(defn wrap-match
+(defn wrap-identify-route
   "Injects the matched route and its path params into the request,
-   then calls the next handler.
-   Optionally accepts a mapping for :pre and :handler function resolution."
+   then calls the next handler."
   [h routes]
-  (fn [r]
-    (when-let [match (dispatch routes r)]
-      (let [[route path-params] match]
-        (h (-> r
-               (assoc-in [match-id] route)
-               (update-in [:params] merge path-params)
-               (assoc-in [:route-params] path-params)))))))
+  (let [compiled-routes (compile/compile-route routes)]
+    (fn [request]
+      (when-let [match (some #(% request) compiled-routes)]
+        (let [match (assoc-in match [:handler] (get-in (:route match) [:methods (:method match)]))]
+          (h (-> request
+                 (assoc-in [match-id] match)
+                 (update-in [:params] merge (:params match)))))) )))
 
 (defn wrap-not-found
   "Renders a 404 if a matched route was not found"
