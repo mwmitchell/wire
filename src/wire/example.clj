@@ -23,19 +23,16 @@
 
 (def app-routes
   (c/routes
-   (c/root
-    {:any (fn [_] (redirect-to app-routes [:login] {}))}
-    [:login {:path "login.html" :get (fn [_] :about)}]
-    [:admin {}
-     [:locations {:get (fn [_] :locations)
-                  :post (fn [_] :create)}
-      [:new {:id :new-location :path "new" :get (fn [_] :new)}]
-      [:item {:path ":id"
-              :get demo-response-handler
-              :put (fn [_] :update)
-              :delete (fn [_] :destroy)}]]])))
-
-(prn app-routes)
+   {:any (fn [_] (redirect-to app-routes [:login] {}))}
+   [:login {:path "login.html" :get (fn [_] :about)}]
+   [:admin {}
+    [:locations {:get (fn [_] :locations)
+                 :post (fn [_] :create)}
+     [:new {:id :new-location :path "new" :get (fn [_] :new)}]
+     [:item {:path ":id"
+             :get demo-response-handler
+             :put (fn [_] :update)
+             :delete (fn [_] :destroy)}]]]))
 
 (def app
   (-> m/wrap-exec-route

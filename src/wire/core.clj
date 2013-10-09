@@ -16,13 +16,18 @@
   {:pre [(map? opts)]}
   `[nil ~(merge {:path ""} opts) ~@children])
 
-(defn routes
+(defn route
   "Builds a tree of routes from:
    [:name opts-map child ...]"
   [[id opts & children]]
   (let [r (merge {:name id
                   :path (if id (name id) nil)
                   :methods (select-keys opts (conj http-methods :any))
-                  :routes (map routes children)}
+                  :routes (map route children)}
                  (apply dissoc opts http-methods))]
     (merge r (parse-path r))))
+
+(defn routes
+  "Builds a set of routes with a base root node"
+  [root-opts & children]
+  (route (apply root root-opts children)))
