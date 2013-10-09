@@ -26,7 +26,7 @@
                          :handler (get-in route [:methods mm])
                          :method mm
                          :params path-params
-                         :full-path full-path
+                         :path full-path
                          :names names}))))]
     (reduce
      (fn [mem r]

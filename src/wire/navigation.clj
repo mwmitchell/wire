@@ -26,6 +26,7 @@
     (some #(collect-by-id % id (vec (conj parents route))) (:routes route))))
 
 (defn find-by-id [route id]
+  {:pre [(keyword? id)]}
   (last (collect-by-id route id)))
 
 (defn up
