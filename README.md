@@ -20,13 +20,18 @@ Here's a sample route definition:
 
 ```clojure
 (def my-routes
-  {:name :parent
-   :methods {:get (fn [request])}
-   :path "items"
-   :routes [{:name :child
-             :path ":id"
-             :rules {:id #"[0-9]+"}
-             :methods {:get (fn [request])}}]})
+  (routes
+   [:login {:path "login.html"
+            :get show-login
+            :post do-login}]
+   [:admin {}
+    [:locations {:get list-locations
+                 :post create-location}
+     [:new-location {:path "new" :get show-location-form}]
+     [:location {:path [":id" :id #"[0-9]+"]
+                 :get show-location
+                 :put update-location
+                 :delete destroy-location}]]])
 ```
 
 A route's path/rules must be compiled in order to dispatch:
@@ -40,7 +45,7 @@ If the route matches the request, a map is returned:
 
 ```clojure
 (def compiled-routes (wire.compile/compile-route my-routes))
-(def result (some #(% {:path-info "1" :request-method :get}) compiled-routes))
+(def result (some #(% {:path-info "/admin/locations/new" :request-method :get}) compiled-routes))
 ```
 
 `result` would end up looking something like:

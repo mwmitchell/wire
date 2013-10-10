@@ -28,7 +28,7 @@
    [:admin {}
     [:locations {:get (fn [_] :locations)
                  :post (fn [_] :create)}
-     [:new-location {:id :new-location :path "new" :get (fn [_] :new)}]
+     [:new-location {:path "new" :get (fn [_] :new)}]
      [:location {:path ":id"
                  :get demo-response-handler
                  :put (fn [_] :update)
