@@ -26,8 +26,7 @@
    {:any (fn [_] (redirect-to app-routes [:login] {}))}
    [:login {:path "login.html" :get (fn [_] :about)}]
    [:admin {}
-    [:locations {:naming false
-                 :get (fn [_] :locations)
+    [:locations {:get (fn [_] :locations)
                  :post (fn [_] :create)}
      [:new-location {:id :new-location :path "new" :get (fn [_] :new)}]
      [:location {:path ":id"
