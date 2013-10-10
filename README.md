@@ -4,14 +4,15 @@ Simple routing for Ring.
 
 The goals of Wire are:
 
-  * define/represent routes as tree
-  * route context/metadata support
+  * define and represent routes as tree structure
+  * route context and metadata support
   * simple helpers (path generation etc.)
   * support standard Ring interface
   * separate identification-of route and execution-of matched handler
 
 ## Usage
-TODO...
+Leiningen TODO...
+[codesignals/wire "0.2.0"]
 
 ## Description
 
@@ -22,14 +23,13 @@ Here's a sample route definition:
   {:name :parent
    :methods {:get (fn [request])}
    :path "items"
-   :rules {}
    :routes [{:name :child
              :path ":id"
              :rules {:id #"[0-9]+"}
              :methods {:get (fn [request])}}]})
 ```
 
-A route's path/rules must be compiled for 
+A route's path/rules must be compiled in order to dispatch:
 
 ```clojure
 (wire.compile/compile-route my-routes)
