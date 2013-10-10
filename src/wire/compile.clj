@@ -10,12 +10,11 @@
       r-method)))
 
 (defn compile-route [route & [parents]]
-  (let [parent-names (vec (keep :name parents))
-        rules (or (merge
+  (let [rules (or (merge
                    (apply merge (map :rules parents))
                    (:rules route)) {})
-        names (vec (keep identity (conj parent-names (:name route))))
-        full-path (str (s/join "/" (map :path parents)) "/" (:path route))
+        names (vec (keep identity (conj (map :name parents) (:name route))))
+        full-path (str "/" (s/join "/" (conj (->> parents (map :path) (keep not-empty) (vec)) (:path route))))
         path-matcher (clout/route-compile full-path (or rules {}))
         matcher (fn [r]
                   (let [rmethod (request-method r)]
