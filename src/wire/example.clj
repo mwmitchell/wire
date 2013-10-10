@@ -26,13 +26,14 @@
    {:any (fn [_] (redirect-to app-routes [:login] {}))}
    [:login {:path "login.html" :get (fn [_] :about)}]
    [:admin {}
-    [:locations {:get (fn [_] :locations)
+    [:locations {:naming false
+                 :get (fn [_] :locations)
                  :post (fn [_] :create)}
-     [:new {:id :new-location :path "new" :get (fn [_] :new)}]
-     [:item {:path ":id"
-             :get demo-response-handler
-             :put (fn [_] :update)
-             :delete (fn [_] :destroy)}]]]))
+     [:new-location {:id :new-location :path "new" :get (fn [_] :new)}]
+     [:location {:path ":id"
+                 :get demo-response-handler
+                 :put (fn [_] :update)
+                 :delete (fn [_] :destroy)}]]]))
 
 (def app
   (-> m/wrap-exec-route
@@ -42,7 +43,7 @@
 (p/route-path-by-id app-routes :new-location {})
 
 ;; path by name hierarchy:
-(p/route-path app-routes [:admin :locations :item] {:id 1})
+(p/route-path app-routes [:admin :locations :location] {:id 1})
 
 ;; Dispatch...
 {:root-result
