@@ -15,7 +15,7 @@ TODO...
 
 ## Description
 
-Route definitions are vectors, maps and functions:
+Here's a sample route definition:
 
 ```clojure
 (def my-routes
@@ -29,13 +29,13 @@ Route definitions are vectors, maps and functions:
              :methods {:get (fn [request])}}]})
 ```
 
-A route's path/rules must be compiled:
+A route's path/rules must be compiled for 
 
 ```clojure
 (wire.compile/compile-route my-routes)
 ```
 
-Compiling the route creates a flattened list of route dispatch functions. The dispatch function argument is a standard Ring request.
+Compiling the route creates a collection of route dispatch functions. The dispatch function argument is a standard Ring request.
 If the route matches the request, a map is returned:
 
 ```clojure
@@ -47,7 +47,7 @@ If the route matches the request, a map is returned:
 
 ```clojure
 {:route ...the route that matched the request
- :handler .. the matching request method function
+ :handler .. the matching request method handler function
  :method .. the request method that matched
  :params .. route path param values
  :path ... the full, matching route path
