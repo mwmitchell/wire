@@ -60,7 +60,7 @@ If the route matches the request, a map is returned:
 Wire provides a few helpers for building routes:
 
 ```clojure
-(routes [:parent-name {:path "xyz.html" :get my-handler}
+(routes [:parent-name {:get my-handler}
          [:child-name {} ...]])
 ```
 
