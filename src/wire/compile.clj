@@ -13,7 +13,7 @@
   (let [rules (or (merge
                    (apply merge (map :rules parents))
                    (:rules route)) {})
-        names (vec (keep identity (conj (map :name parents) (:name route))))
+        names (vec (keep identity (conj (mapv :name parents) (:name route))))
         full-path (str "/" (s/join "/" (conj (->> parents (map :path) (keep not-empty) (vec)) (:path route))))
         path-matcher (clout/route-compile full-path (or rules {}))
         matcher (fn [r]
