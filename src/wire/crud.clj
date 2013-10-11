@@ -29,6 +29,7 @@
        :get (:index fn-mapping)
        :post (:create fn-mapping)}]]))
 
+
 (comment
   (require 'wire.compile)
   (require 'wire.core)
@@ -40,7 +41,7 @@
                   :show identity
                   :edit identity}
         place-routes (resources :place :places handlers)
-        routes (wire.core/routes {} (apply conj [:admin {}] place-routes))
+        routes (apply wire.core/routes {:path "admin"} place-routes)
         croutes (wire.compile/compile-route routes)
         match (some #(% {:path-info "/admin/places/100/edit" :request-method :get}) croutes)]
     ((:handler match) {:params (:params match) :names (:names match)})))
