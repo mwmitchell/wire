@@ -9,8 +9,8 @@
   "The last element in the middleware chain.
    This executes the matched route handler"
   [r]
-  (when (match-id r)
-    ((get-in r [match-id :handler]) r)))
+  (when-let [handler (get-in r [match-id :handler])]
+    (handler r)))
 
 (defn wrap-identify-route
   "Injects the matched route and its path params into the request,

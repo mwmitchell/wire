@@ -9,17 +9,16 @@
       (keyword (s/lower-case (name form-method)))
       r-method)))
 
-(defn compile-route [route & [parents]]
-  (let [rules (or (merge
-                   (apply merge (map :rules parents))
-                   (:rules route)) {})
+(defn compile-route [{methods :methods :as route} & [parents]]
+  (let [rules (merge {} (apply merge (map :rules parents)) (:rules route))
         names (vec (keep identity (conj (mapv :name parents) (:name route))))
-        full-path (str "/" (s/join "/" (conj (->> parents (map :path) (keep not-empty) (vec)) (:path route))))
-        path-matcher (clout/route-compile full-path (or rules {}))
+        path-components (conj (->> parents (map :path) (keep not-empty) (vec)) (:path route))
+        full-path (str "/" (s/join "/" path-components))
+        path-matcher (clout/route-compile full-path rules)
         matcher (fn [r]
                   (let [rmethod (request-method r)]
-                    (when-let [mm (or (and (contains? (:methods route) rmethod) rmethod)
-                                      (and (contains? (:methods route) :any) :any))]
+                    (when-let [mm (or (and (contains? methods rmethod) rmethod)
+                                      (and (contains? methods :any) :any))]
                       (when-let [path-params (clout/route-matches path-matcher r)]
                         {:route route
                          :handler (get-in route [:methods mm])
