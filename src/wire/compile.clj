@@ -30,4 +30,4 @@
      (fn [mem r]
        (concat mem (compile-route r (conj (vec parents) route))))
      [matcher]
-     (:routes route))))
+     (:children route))))

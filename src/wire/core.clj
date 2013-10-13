@@ -6,7 +6,7 @@
 ;; {:name :keyword-identifier
 ;;  :path "the-path" ;; also ["path/:var" :var #"regexp-rule"]
 ;;  :methods {:get fn1 :post fn2}
-;;  :routes []}
+;;  :children []}
 
 (def http-methods #{:get :post :put :delete :patch :head :options :trace :connect})
 
@@ -25,7 +25,7 @@
   (-> {:name id
        :path (when id (name id))
        :methods (select-keys opts (conj http-methods :any))
-       :routes (mapv #(apply route %) children)}
+       :children (mapv #(apply route %) children)}
       (merge (apply dissoc opts http-methods))
       (merge-path-attrs)))
 

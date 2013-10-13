@@ -4,11 +4,11 @@
   "Given a single route map, traverses and collects
    child routes whose :id matches the current value in `ids`
    Example:
-   (collect-routes {:name nil :routes [{:name :sub}]} [:sub])"
+   (collect-routes {:name nil :children [{:name :sub}]} [:sub])"
   [root names]
   (->> names
        (reduce
-        (fn [[{r :routes :as current} mem :as state] rname]
+        (fn [[{r :children :as current} mem :as state] rname]
           (when-let [child (->> r (filter #(= rname (:name %))) first)]
             [child (conj mem child)]))
         [root [root]])
@@ -23,7 +23,7 @@
   [route id & [parents]]
   (if (= (:id route) id)
     (conj (vec parents) route)
-    (some #(collect-by-id % id (vec (conj parents route))) (:routes route))))
+    (some #(collect-by-id % id (vec (conj parents route))) (:children route))))
 
 (defn find-by-id [route id]
   {:pre [(keyword? id)]}
