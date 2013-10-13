@@ -18,13 +18,13 @@
 
 (defn route
   "Builds a tree of routes from:
-   [:name opts-map child1 child2 child3 ...]
-  If a :path is not provided, the id of the route is used."
-  [id opts & children]
+   [:the-route-name opts-map child1 child2 child3 ...]
+  If a :path is not provided, the name of the route is used."
+  [rname opts & children]
   {:pre [(map? opts)]}
   (-> {:id nil
-       :name id
-       :path (when id (name id))
+       :name rname
+       :path (when rname (name rname))
        :methods (select-keys opts (conj http-methods :any))
        :children (mapv #(apply route %) children)}
       (merge (apply dissoc opts http-methods))
