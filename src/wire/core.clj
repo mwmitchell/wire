@@ -22,7 +22,8 @@
   If a :path is not provided, the id of the route is used."
   [id opts & children]
   {:pre [(map? opts)]}
-  (-> {:name id
+  (-> {:id nil
+       :name id
        :path (when id (name id))
        :methods (select-keys opts (conj http-methods :any))
        :children (mapv #(apply route %) children)}
