@@ -28,7 +28,7 @@
        :path (when rname (name rname))
        :methods (select-keys opts valid-method-names)
        :children (mapv #(apply route %) children)}
-      (merge (apply dissoc opts http-methods))
+      (merge (apply dissoc opts valid-method-names))
       (merge-path-attrs)))
 
 (defn routes
