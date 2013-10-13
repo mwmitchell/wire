@@ -9,6 +9,7 @@
 ;;  :children []}
 
 (def http-methods #{:get :post :put :delete :patch :head :options :trace :connect})
+(def valid-method-names (conj http-methods :any))
 
 (defn- merge-path-attrs [{v :path :as m}]
   (merge m (cond
@@ -25,7 +26,7 @@
   (-> {:id nil
        :name rname
        :path (when rname (name rname))
-       :methods (select-keys opts (conj http-methods :any))
+       :methods (select-keys opts valid-method-names)
        :children (mapv #(apply route %) children)}
       (merge (apply dissoc opts http-methods))
       (merge-path-attrs)))
