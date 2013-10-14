@@ -24,6 +24,7 @@
   [rname opts & children]
   {:pre [(map? opts)]}
   (-> {:id nil
+       :rules {}
        :name rname
        :path (when rname (name rname))
        :methods (select-keys opts valid-method-names)
