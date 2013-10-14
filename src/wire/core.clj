@@ -1,6 +1,4 @@
-(ns wire.core
-  (:require [clojure.string :as s]
-            [clojure.set :refer [difference]]))
+(ns wire.core)
 
 ;; A Routes is a map:
 ;; {:name :keyword-identifier
@@ -8,8 +6,8 @@
 ;;  :methods {:get fn1 :post fn2}
 ;;  :children []}
 
-(def http-methods #{:get :post :put :delete :patch :head :options :trace :connect})
-(def valid-method-names (conj http-methods :any))
+(def ^:private http-methods #{:get :post :put :delete :patch :head :options :trace :connect})
+(def ^:private valid-method-names (conj http-methods :any))
 
 (defn- merge-path-attrs [{v :path :as m}]
   (merge m (cond
