@@ -3,16 +3,28 @@
             [clojure.set :refer [difference]]
             [clojure.string :as s]))
 
-(defn replace-params
-  "Replaces the path params (fragments starting with a :)
-   in `path` with the values in `opts`
-   Example:
-   (replace-params \"my/path/:id\" {:id 1})"
+(defn- replace-wildcards [path wildcard-values]
+  (if-let [pkeys (seq (mapv (comp keyword last) (re-seq #"(\*)" path)))]
+    (do
+      (assert (coll? wildcard-values))
+      (when-not (= (count wildcard-values) (count pkeys))
+        (throw (Exception. (format "The route wildcards for %s are missing" path))))
+      (reduce #(s/replace-first %1 "*" (str %2)) path wildcard-values))
+    path))
+
+(defn- replace-named-params
   [path opts]
-  (let [pkeys (map (comp keyword last) (re-seq #":([^ \/\?\&]+)" path))]
+  (let [pkeys (mapv (comp keyword last) (re-seq #":([^ \/\?\&]+)" path))]
     (when-let [diff (seq (difference (set pkeys) (-> opts keys set)))]
       (throw (Exception. (format "The route params %s for %s are missing" diff path))))
     (reduce-kv #(s/replace %1 (str ":" (name %2)) (str %3)) path opts)))
+
+(defn- replace-params [path opts]
+  (replace-wildcards
+   (replace-named-params path (dissoc opts :*))
+   (:* opts)))
+
+;;
 
 (defn- make-path [route-set path-values]
   (str "/"
