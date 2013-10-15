@@ -14,20 +14,20 @@
       (throw (Exception. (format "The route params %s for %s are missing" diff path))))
     (reduce-kv #(s/replace %1 (str ":" (name %2)) (str %3)) path opts)))
 
+(defn- make-path [route-set path-values]
+  (str "/"
+       (replace-params
+        (->> route-set
+             (keep (comp not-empty :path))
+             (s/join "/"))
+        path-values)))
+
 (defn route-path
   "Creates a param populated path suitable for use in an URL.
    Example:
    (route-path root-route [:child :node] {:param 100})"
   [root names path-values]
-  (replace-params
-   (->> (collect-routes root names)
-        (map :path)
-        (s/join "/"))
-   path-values))
+  (make-path (collect-routes root names) path-values))
 
 (defn route-path-by-id [route id path-values]
-  (replace-params
-   (->> (collect-by-id route id)
-        (map :path)
-        (s/join "/"))
-   path-values))
+  (make-path (collect-by-id route id) path-values))
