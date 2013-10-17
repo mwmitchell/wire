@@ -20,7 +20,7 @@ Here's a sample route definition:
 
 ```clojure
 (def my-routes
-  (routes
+  (root
    [:login {:path "login.html"
             :get show-login
             :post do-login}]
@@ -45,18 +45,13 @@ If the route matches the request, a map is returned:
 
 ```clojure
 (def compiled-routes (wire.compile/compile-route my-routes))
-(def result (some #(% {:path-info "/admin/locations/new" :request-method :get}) compiled-routes))
+(def result (some #((:matcher %) {:path-info "/admin/locations/new" :request-method :get}) compiled-routes))
 ```
 
 `result` would end up looking something like:
 
 ```clojure
-{:route ...the route that matched the request
- :handler .. the matching request method handler function
- :method .. the request method that matched
- :params .. route path param values
- :path ... the full, matching route path
- :names ... a vector path of route names}
+;; TODO...
 ```
 
 ### Helpers
@@ -65,8 +60,9 @@ If the route matches the request, a map is returned:
 Wire provides a few helpers for building routes:
 
 ```clojure
-(routes [:parent-name {:get my-handler}
-         [:child-name {} ...]])
+(root {}
+  [:parent-name {:get my-handler}
+    [:child-name {} ...]])
 ```
 
 ##### Arguments...
