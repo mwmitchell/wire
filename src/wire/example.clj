@@ -1,28 +1,27 @@
 (ns wire.example
-  (:require [wire.core :as c]
+  (:require [wire.routing :as r]
             [wire.middleware :as m]
-            [clojure.string :as s]
-            [wire.navigation :as n]
-            [wire.path :as p]))
+            [clojure.string :as s]))
 
 (declare app-routes)
 
 (defn demo-response-handler
   [{route-context :route-context}]
-  (let [hierarchy (n/collect-routes app-routes (:names route-context))]
-    {:matched-method (:method route-context)
-     :names (:names route-context)
-     :full-route-path (s/join "/" (map :path hierarchy))
-     :url (p/route-path app-routes (:names route-context) (:params route-context))
-     :parent-url (p/route-path app-routes (n/up (:names route-context) 1) (:params route-context))
+  (let [hierarchy (r/collect-each app-routes (:ids route-context))]
+    {:hierarchy (:ids route-context)
+     :matched-method (:method route-context)
+     :names (:ids route-context)
+     :full-route-path (s/join "/" (map r/path hierarchy))
+     :url (r/route-path app-routes (:ids route-context) (:params route-context))
+     :parent-url (r/route-path app-routes (butlast (:ids route-context)) (:params route-context))
      :params (get-in route-context [:params])}))
 
 (defn redirect-to [routes path params]
-  {:headers {"Location" (p/route-path app-routes path params)}
+  {:headers {"Location" (r/route-path app-routes path params)}
    :status 302})
 
 (def app-routes
-  (c/routes
+  (r/root
    {:any (fn [_] (redirect-to app-routes [:login] {}))}
    [:login {:path "login.html" :get (fn [_] :about)}]
    [:admin {}
@@ -39,10 +38,10 @@
       (m/wrap-identify-route app-routes)))
 
 ;; path by global id:
-(p/route-path-by-id app-routes :new-location {})
+(r/route-path-by app-routes #(= (r/id %) :new-location) {})
 
 ;; path by name hierarchy:
-(p/route-path app-routes [:admin :locations :location] {:id 1})
+(r/route-path app-routes [:admin :locations :location] {:id 1})
 
 ;; Dispatch...
 {:root-result

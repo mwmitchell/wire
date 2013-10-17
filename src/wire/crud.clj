@@ -32,7 +32,7 @@
 
 (comment
   (require 'wire.compile)
-  (require 'wire.core)
+  (require 'wire.routing)
   (let [handlers {:create identity
                   :index identity
                   :update identity
@@ -41,7 +41,7 @@
                   :show identity
                   :edit identity}
         place-routes (resources :place :places handlers)
-        routes (apply wire.core/routes {:path "admin"} place-routes)
+        routes (apply wire.routing/root {:path "admin"} place-routes)
         croutes (wire.compile/compile-route routes)
-        match (some #(% {:path-info "/admin/places/100/edit" :request-method :get}) croutes)]
+        match (some #((:matcher %) {:path-info "/admin/places/100/edit" :request-method :get}) croutes)]
     ((:handler match) {:params (:params match) :names (:names match)})))

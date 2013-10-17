@@ -1,6 +1,5 @@
 (ns wire.middleware
-  (require [wire.navigation :as nav]
-           [wire.compile :as compile]))
+  (require [wire.compile :as compile]))
 
 ;; The name of the route-def that's injected into the request map
 (def match-id :route-context)
@@ -18,7 +17,7 @@
   [h routes]
   (let [compiled-routes (compile/compile-route routes)]
     (fn [request]
-      (when-let [match (some #(% request) compiled-routes)]
+      (when-let [match (some #((:matcher %) request) compiled-routes)]
         (h (-> request
                (assoc-in [match-id] match)
                (update-in [:params] merge (:params match))))) )))

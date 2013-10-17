@@ -1,5 +1,6 @@
 (ns wire.compile
-  (:require [clojure.string :as s]
+  (:require [wire.routing :as r]
+            [clojure.string :as s]
             [clout.core :as clout]))
 
 (defn- request-method
@@ -23,26 +24,28 @@
      :handler - the matching route handler function
      :method - the matching request method
      :path - the full path to the route
-     :names - a vector of :name values from the root down to the matching route"
-  [{methods :methods :as route} & [parents]]
-  (let [rules (merge (apply merge (map :rules parents)) (:rules route))
-        names (vec (keep identity (conj (mapv :name parents) (:name route))))
-        path-components (conj (->> parents (map :path) (keep not-empty) (vec)) (:path route))
+     :ids - a vector of :id values from the root down to the matching route"
+  [route & [parents]]
+  (let [handlers (r/handlers route)
+        rules (merge (apply merge (map r/rules parents)) (r/rules route))
+        ids (vec (keep identity (conj (mapv r/id parents) (r/id route))))
+        path-components (conj (->> parents (map r/path) (keep not-empty) (vec)) (r/path route))
         full-path (str "/" (s/join "/" path-components))
         path-matcher (clout/route-compile full-path rules)
         matcher (fn [r]
                   (let [rmethod (request-method r)]
-                    (when-let [mm (or (and (contains? methods rmethod) rmethod)
-                                      (and (contains? methods :any) :any))]
+                    (when-let [mm (or (and (contains? handlers rmethod) rmethod)
+                                      (and (contains? handlers :any) :any))]
                       (when-let [path-params (clout/route-matches path-matcher r)]
                         {:route route
-                         :handler (get-in route [:methods mm])
+                         :handlers handlers
+                         :handler (get handlers mm)
                          :method mm
                          :params path-params
                          :path full-path
-                         :names names}))))]
+                         :ids ids}))))]
     (reduce
      (fn [mem r]
        (concat mem (compile-route r (conj (vec parents) route))))
-     [matcher]
-     (:children route))))
+     [{:matcher matcher :full-path full-path :handlers handlers}]
+     (r/children route))))
