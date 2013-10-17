@@ -1,7 +1,8 @@
 (ns wire.compile
   (:require [wire.routing :as r]
             [clojure.string :as s]
-            [clout.core :as clout]))
+            [clout.core :as clout]
+            [clojure.tools.logging :as log]))
 
 (defn- request-method
   "Accepts a Ring request map, returns a request method (keyword).
@@ -32,20 +33,22 @@
         path-components (conj (->> parents (map r/path) (keep not-empty) (vec)) (r/path route))
         full-path (str "/" (s/join "/" path-components))
         path-matcher (clout/route-compile full-path rules)
+        context {:route route
+                 :rules rules
+                 :path full-path
+                 :ids ids}
         matcher (fn [r]
                   (let [rmethod (request-method r)]
                     (when-let [mm (or (and (contains? handlers rmethod) rmethod)
                                       (and (contains? handlers :any) :any))]
                       (when-let [path-params (clout/route-matches path-matcher r)]
-                        {:route route
-                         :handlers handlers
-                         :handler (get handlers mm)
-                         :method mm
-                         :params path-params
-                         :path full-path
-                         :ids ids}))))]
+                        (assoc context
+                          :method mm
+                          :handler (get handlers mm)
+                          :params path-params)))))]
+    (log/debugf "Compiled route context: %s" context)
     (reduce
      (fn [mem r]
        (concat mem (compile-route r (conj (vec parents) route))))
-     [{:matcher matcher :full-path full-path :handlers handlers}]
+     [matcher]
      (r/children route))))

@@ -17,7 +17,7 @@
   [h routes]
   (let [compiled-routes (compile/compile-route routes)]
     (fn [request]
-      (when-let [match (some #((:matcher %) request) compiled-routes)]
+      (when-let [match (some #(% request) compiled-routes)]
         (h (-> request
                (assoc-in [match-id] match)
                (update-in [:params] merge (:params match))))) )))
