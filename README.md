@@ -10,17 +10,22 @@ The goals of Wire are:
   * support standard Ring interface
   * separate identification-of route and execution-of matched handler
 
+##Examples
 There's an example app in the "/wireapp" directory, and an example.clj file in /src/wire.
 
 ## Usage
-Leiningen TODO...
-[codesignals/wire "0.2.0"]
+
+```clojure
+[codesignals/wire "0.3.0"]
+```
 
 ## Description
 
 Here's a sample route definition:
 
 ```clojure
+(require '[wire.routing :refer :all])
+
 (def my-routes
   (root
    [:login {:path "login.html"
@@ -36,10 +41,18 @@ Here's a sample route definition:
                  :delete destroy-location}]]])
 ```
 
-The data-structure that describes a route is a vector. The first element in the vector is the route's ID. This ID is an identifier used for locating the route. The next element is a hash-map describing the route options; The request method handlers, the path, etc.. Following the options hash-map is the list of child routes.
+The main structure that contains a route is a vector. The first element in the vector is the route's ID. This ID is an identifier used for locating the route and building paths etc..
+
+The next element is a hash-map describing the route options; The request method handlers, the path, etc..
+
+Following the options hash-map is the list of child routes.
 
 ```clojure
-[:id opts [:child-a-id {} [:child-a-a-id {}]] [:child-b {}]]
+[:id {:get (fn [request])}
+  [:child-a-id {:get (fn [request])}
+    [:child-a-a-id {:path ["a-a.:format" :format #"[a-z]{3,0}"]
+                    :get (fn [request])}]]
+  [:child-b {:path "b" ...}]]
 ```
 
 ##API
