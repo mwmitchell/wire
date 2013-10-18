@@ -5,6 +5,8 @@ pom.xml
 /targets/
 .lein-deps-sum
 
+/pom.*
+
 /dev
 /target
 .lein-repl-history
