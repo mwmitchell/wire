@@ -20,7 +20,8 @@
 (defn path [[id {p :path} & _]]
   (or (when (vector? p) (first p))
       p
-      (name id)))
+      (when (string? id) id)
+      (s/join #"/" (keep #(% id) [namespace name]))))
 
 (defn rules [[_ {p :path r :rules} & _]]
   (or
