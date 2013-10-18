@@ -20,6 +20,11 @@ There's an example app in the "/wireapp" directory, and an example.clj file in /
 ```
 
 ## Description
+The main structure that contains a route is a vector. The first element in the vector is the route's ID. This ID is an identifier used for locating the route and building paths etc..
+
+The next element is a hash-map describing the route options; The request method handlers, the path, etc..
+
+Following the options hash-map is the list of child routes.
 
 Here's a sample route definition:
 
@@ -39,20 +44,6 @@ Here's a sample route definition:
                  :get show-location
                  :put update-location
                  :delete destroy-location}]]])
-```
-
-The main structure that contains a route is a vector. The first element in the vector is the route's ID. This ID is an identifier used for locating the route and building paths etc..
-
-The next element is a hash-map describing the route options; The request method handlers, the path, etc..
-
-Following the options hash-map is the list of child routes.
-
-```clojure
-[:id {:get (fn [request])}
-  [:child-a-id {:get (fn [request])}
-    [:child-a-a-id {:path ["a-a.:format" :format #"[a-z]{3,0}"]
-                    :get (fn [request])}]]
-  [:child-b {:path "b" ...}]]
 ```
 
 ##API
@@ -79,6 +70,16 @@ If the route matches the request, a map is returned:
 
 ```clojure
 ;; TODO...
+```
+
+###Middleware
+
+```clojure
+(require '[wire.middleware :as m])
+
+(def handler
+  (-> m/wrap-exec-route
+      (m/wrap-identify-route app-routes)))
 ```
 
 ### Helpers
