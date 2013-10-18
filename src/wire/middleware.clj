@@ -1,5 +1,6 @@
 (ns wire.middleware
-  (require [wire.compile :as compile]))
+  (require [wire.compile :as compile]
+           [wire.response :as response]))
 
 ;; The name of the route-def that's injected into the request map
 (def match-id :route-context)
@@ -9,7 +10,7 @@
    This executes the matched route handler"
   [r]
   (when-let [handler (get-in r [match-id :handler])]
-    (handler r)))
+    (response/render (handler r) r)))
 
 (defn wrap-identify-route
   "Injects the matched route and its path params into the request,
