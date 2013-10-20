@@ -20,6 +20,15 @@
 (defn parent [request]
   (-> request context :routes butlast last))
 
+(defn depth [request]
+  (-> request context :routes count))
+
+(defn route-at [request depth]
+  (get (-> request context :routes) (- depth 1)))
+
+(defn route-from [request inv-depth]
+  (route-at request (- (depth request) inv-depth)))
+
 (defn path [request]
   (-> request context :path))
 
