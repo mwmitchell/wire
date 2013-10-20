@@ -95,3 +95,8 @@
 
 (defn route-path-by [route fn path-values]
   (make-path (butlast (collect-by route fn)) path-values))
+
+(defn make-path-generator
+  [route]
+  (fn [ids & [params]]
+    (route-path route ids params)))
