@@ -32,5 +32,5 @@
 (defn path-for
   "Using the root route, builds a path based on the ids vector.
    Params is a map of values for the path params."
-  [request ids params]
+  [request ids & [params]]
   (r/route-path (root request) ids params))
