@@ -44,4 +44,4 @@
         routes (apply wire.routing/root {:path "admin"} place-routes)
         croutes (wire.compile/compile-route routes)
         match (some #(% {:path-info "/admin/places/100/edit" :request-method :get}) croutes)]
-    ((:handler match) {:params (:params match) :names (:names match)})))
+    ((:handler match) {:params (:params match) :ids (:ids match)})))
