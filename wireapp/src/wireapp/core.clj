@@ -1,6 +1,7 @@
 (ns wireapp.core
   (:require [wire.routing :as r]
             [wire.middleware :as m]
+            [wire.helpers :as h :refer [path-for]]
             [hiccup.core :as html]
             [hiccup.page :as page]
             [clojure.tools.logging :as log]
@@ -17,56 +18,52 @@
   {:path "*"
    :get #(file-response (str path "/" (get-in % [:params :*])))})
 
-(declare app-routes)
-
-(defn path-for [names & {:as params}]
-  {:pre [(vector? names)]}
-  (r/route-path app-routes names params))
-
 (defn render [body & {:keys [status headers]}]
   {:body body :status (or status 200) :headers (or headers {})})
 
 (defn render-html [body & {:keys [status headers]}]
   (render body :status status :headers (merge headers {"Content-Type" "text/html"})))
 
-(defn navigation [current-route]
+(defn navigation [rq]
   (html/html [:ul
-              [:li [:a {:href (path-for [])} "home"]]
-              [:li [:a {:href (path-for [:about])} "about"]]
-              [:li [:a {:href (path-for [:categories])} "categories"]]
-              [:li [:a {:href (path-for [:categories :one] :format "csv")} "category I"]]
-              [:li [:a {:href (path-for [:categories :two] :format "pdf")} "category II"]]
-              [:li [:a {:href (path-for [:resources] :* ["app.css"])} "app.css"]]]))
+              [:li [:a {:href (path-for rq [])} "home"]]
+              [:li [:a {:href (path-for rq [:about])} "about"]]
+              [:li [:a {:href (path-for rq [:categories])} "categories"]]
+              [:li [:a {:href (path-for rq [:categories :one] {:format "csv"})} "category I"]]
+              [:li [:a {:href (path-for rq [:categories :two] {:format "pdf"})} "category II"]]
+              [:li [:a {:href (path-for rq [:resources] {:* ["app.css"]})} "app.css"]]]))
 
-(defn page [title content]
+(defn page [rq title content]
   (render-html
    (page/html5
-    (page/include-css (str (path-for []) "app.css"))
+    (page/include-css (str (path-for rq []) "app.css"))
     [:head [:title title]]
     [:body [:div {:id "container"}
-            [:div {:id "left"} (navigation nil)]
+            [:div {:id "left"} (navigation rq)]
             [:div {:id "right"}
              [:p [:h3 title]
               content]]]])))
 
+(defn child-links [rq]
+  (html/html
+   [:ul
+    (for [child (r/children (h/current rq))]
+      [:li [:a {:href (path-for rq (conj (h/ids rq) (r/id child))
+                                {:format "xml"})}
+            (r/id child)]])]))
+
 (def app-routes
   (r/root
    ;; Root handlers...
-   {:get (fn [_] (page "Wire Example" (path-for [])))}
+   {:get (fn [rq] (page rq "Wire Example" (path-for rq [] {})))}
    ;; Child routes...
-   [:about {:get (fn [_] (page "About" "Hi there."))}]
-   [:categories {:get (fn [{{route :route ids :ids} :route-context}]
-                        (page "Categories"
-                              (html/html
-                               [:ul
-                                (for [child (r/children route)]
-                                  [:li [:a {:href (path-for (conj ids (r/id child)) :format "xml")} (r/id child)]])])))}
-    [:one {::schema-validate? true
-           ::basic-auth? true
-           :path "I.:format"
-           :get (fn [_] (page "one" "I"))}]
+   [:about {:get (fn [rq] (page rq "About" "Hi there."))}]
+   [:categories {:get (fn [rq]
+                        (page rq "Categories" (child-links rq)))}
+    [:one {:path "I.:format"
+           :get (fn [rq] (page rq "one" "I"))}]
     [:two {:path "II.:format"
-           :get (fn [_] (page "two" "II"))}]]
+           :get (fn [rq] (page rq "two" "II"))}]]
    ;; static asset handlers...
    [:resources (resources "public")]
    [:files (files "resources/public")]))
