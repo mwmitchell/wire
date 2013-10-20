@@ -22,7 +22,7 @@
        :put (:update fn-mapping)
        :delete (:destroy fn-mapping)}]
      [(keyword (str "edit-" (name singular)))
-      {:path [(str (name plural) "/:id/edit") :id #"[0-9]+"]
+      {:path [(str (name plural) "/:id/edit")]
        :get (:edit fn-mapping)}]
      [plural
       {:path (name plural)
