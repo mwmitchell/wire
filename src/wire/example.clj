@@ -6,7 +6,9 @@
 
 (defn demo-response-handler
   [request]
-  {:ids (h/ids request)
+  {:parent (r/id (h/parent request))
+   :children (map r/id (r/children (h/current request)))
+   :ids (h/ids request)
    :matched-method (h/method request)
    :full-route-path (h/path request)
    :url (h/path-for request (h/ids request) (h/params request))

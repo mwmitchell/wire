@@ -17,6 +17,9 @@
   [request]
   (-> request context :routes (last)))
 
+(defn parent [request]
+  (-> request context :routes butlast last))
+
 (defn path [request]
   (-> request context :path))
 
@@ -34,3 +37,4 @@
    Params is a map of values for the path params."
   [request ids & [params]]
   (r/route-path (root request) ids params))
+
