@@ -22,10 +22,12 @@
    Each dispatch function requires a Ring request map.
    A matching dispatcher (when executed) will return a map:
      :route - the matching route map
-     :handler - the matching route handler function
-     :method - the matching request method
+     :rules - path param rules (includes all parent rules)
      :path - the full path to the route
-     :ids - a vector of :id values from the root down to the matching route"
+     :ids - a vector of :id values from the root down to the matching route
+     :method - the matching http-request method as a keyword
+     :handler - the matching route handler function
+     :params - the path param value map"
   [route & [parents]]
   (let [handlers (r/handlers route)
         rules (merge (apply merge (map r/rules parents)) (r/rules route))
@@ -33,7 +35,7 @@
         path-components (conj (->> parents (map r/path) (keep not-empty) (vec)) (r/path route))
         full-path (str "/" (s/join "/" path-components))
         path-matcher (clout/route-compile full-path rules)
-        context {:route route
+        context {:routes (conj (vec parents) route)
                  :rules rules
                  :path full-path
                  :ids ids}
@@ -52,3 +54,8 @@
        (concat mem (compile-route r (conj (vec parents) route))))
      [matcher]
      (r/children route))))
+
+(defn identifier [route]
+  (let [compiled-route (compile-route route)]
+    (fn [request]
+      (some #(% request) compiled-route))))
