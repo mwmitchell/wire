@@ -6,7 +6,9 @@
 
 (defn demo-response-handler
   [request]
-  {:parent (r/id (h/parent request))
+  {:depth (h/depth request)
+   :grand-parent (r/id (h/route-from request 2))
+   ;;:parent (r/id (h/parent request))
    :children (map r/id (r/children (h/current request)))
    :ids (h/ids request)
    :matched-method (h/method request)
@@ -30,7 +32,8 @@
      [:location {:path ":id"
                  :get demo-response-handler
                  :put (fn [_] :update)
-                 :delete (fn [_] :destroy)}]]]))
+                 :delete (fn [_] :destroy)}
+      [:clone {:post (fn [rq] (str (-> rq :params :id) " cloned!"))}]]]]))
 
 (def app
   (-> m/wrap-exec-route
@@ -52,6 +55,9 @@
  :destroy-location-result
  (app {:path-info "/admin/locations/100"
        :request-method :delete})
+ :clone-location-result
+ (app {:path-info "/admin/locations/100/clone"
+       :request-method :post})
  :demo-response
  (app {:path-info "/admin/locations/99"
        :request-method :get})}
