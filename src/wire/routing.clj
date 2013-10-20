@@ -61,16 +61,14 @@
 
 (defn- replace-wildcards [p wildcard-values]
   (if-let [pkeys (seq (mapv (comp keyword last) (re-seq #"(\*)" p)))]
-    (do
-      (assert (coll? wildcard-values))
-      (when-not (= (count wildcard-values) (count pkeys))
-        (throw (Exception. (format "The route wildcards for %s are missing" p))))
-      (reduce #(s/replace-first %1 "*" (str %2)) p wildcard-values))
+    (do (when-not (= (count wildcard-values) (count pkeys))
+          (throw (Exception. (format "The route wildcards for %s are missing" p))))
+        (reduce #(s/replace-first %1 "*" (str %2)) p wildcard-values))
     p))
 
 (defn- replace-named-params
   [p opts]
-  (let [pkeys (mapv (comp keyword last) (re-seq #":([^ \/\?\&]+)" p))]
+  (let [pkeys (mapv (comp keyword last) (re-seq #":([^ \/\?\&\.]+)" p))]
     (when-let [diff (seq (difference (set pkeys) (-> opts keys set)))]
       (throw (Exception. (format "The route params %s for %s are missing" diff p))))
     (reduce-kv #(s/replace %1 (str ":" (name %2)) (str %3)) p opts)))
@@ -97,7 +95,3 @@
 
 (defn route-path-by [route fn path-values]
   (make-path (butlast (collect-by route fn)) path-values))
-
-(comment
-  (route-path-by (root {} [:about {} [:me {}] [:you {}]]) #(= :you (id %)) {})
-  (route-path (root {} [:about {} [:me {}] [:you {}]]) [:about :you] {}))
