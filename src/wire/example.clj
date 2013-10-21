@@ -5,7 +5,7 @@
             [clojure.string :as s]))
 
 (defn demo-response-handler
-  [request]
+  [_]
   {:depth (h/depth)
    :grand-parent (r/id (h/route-from 2))
    ;;:parent (r/id (h/parent request))
@@ -37,7 +37,7 @@
 
 (def app
   (-> m/wrap-exec-route
-      (m/wrap-bind-identifed-route app-routes)))
+      (m/wrap-identify-route app-routes)))
 
 ;; path by global id:
 (r/route-path-by app-routes #(= (r/id %) :new-location) {})

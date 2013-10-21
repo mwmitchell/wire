@@ -69,13 +69,13 @@
 
 (defn wrap-route-logger [h]
   (fn [r]
-    (log/infof "Wire route context: %s" (dissoc m/*context* :routes))
+    (log/infof "Wire route context: %s" (dissoc (m/context) :routes))
     (h r)))
 
 (def handler
   (-> m/wrap-exec-route
       (wrap-route-logger)
-      (m/wrap-bind-identified-route app-routes)
+      (m/wrap-identify-route app-routes)
       (wrap-file-info)
       (wrap-content-type)
       (wrap-head)))

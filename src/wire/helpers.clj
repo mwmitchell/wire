@@ -2,20 +2,14 @@
   (:require [wire.routing :as r]
             [wire.middleware :as mw]))
 
-(defn context
-  "Returns the matched route context map"
-  ([request]
-     (mw/match-id request))
-  ([] mw/*context*))
-
 (defmacro defhelper [name local-name args & body]
   `(defn ~name
      ([request# ~@args]
         {:pre [(map? request#)]}
-        (let [~local-name (context request#)]
+        (let [~local-name (mw/context request#)]
           ~@body))
      ([~@args]
-        (let [~local-name (context)]
+        (let [~local-name (mw/context)]
           ~@body))))
 
 ;; Returns the root route from the context
