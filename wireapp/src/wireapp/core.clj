@@ -5,7 +5,7 @@
             [hiccup.core :as html]
             [hiccup.page :as page]
             [clojure.tools.logging :as log]
-            [ring.util.response :refer (file-response resource-response status)]
+            [ring.util.response :refer [resource-response]]
             [ring.middleware.file-info :refer [wrap-file-info]]
             [ring.middleware.content-type :refer [wrap-content-type]]
             [ring.middleware.head :refer [wrap-head]]))
@@ -14,29 +14,30 @@
   {:path "*"
    :get #(resource-response (str path "/" (get-in % [:params :*])))})
 
-(defn files [path]
-  {:path "*"
-   :get #(file-response (str path "/" (get-in % [:params :*])))})
-
 (defn render [body & {:keys [status headers]}]
   {:body body :status (or status 200) :headers (or headers {})})
 
 (defn render-html [body & {:keys [status headers]}]
   (render body :status status :headers (merge headers {"Content-Type" "text/html"})))
 
+(defn nav-item [rq label ids & [params]]
+  [:li [:a {:href (path-for rq ids params)} label]])
+
 (defn navigation [rq]
-  (html/html [:ul
-              [:li [:a {:href (path-for rq [])} "home"]]
-              [:li [:a {:href (path-for rq [:about])} "about"]]
-              [:li [:a {:href (path-for rq [:categories])} "categories"]]
-              [:li [:a {:href (path-for rq [:categories :one] {:format "csv"})} "category I"]]
-              [:li [:a {:href (path-for rq [:categories :two] {:format "pdf"})} "category II"]]
-              [:li [:a {:href (path-for rq [:resources] {:* ["app.css"]})} "app.css"]]]))
+  (let [ni (partial nav-item rq)]
+    (html/html
+     [:ul
+      (ni "home" [])
+      (ni "about" [:about])
+      (ni "categories" [:categories])
+      (ni "category I" [:categories :one] {:format "csv"})
+      (ni "category II" [:categories :two] {:format "pdf"})
+      (ni "app.css" [:resources] {:* ["app.css"]})])))
 
 (defn page [rq title content]
   (render-html
    (page/html5
-    (page/include-css (str (path-for rq []) "app.css"))
+    (page/include-css (str (path-for rq [:resources] {:* ["app.css"]})))
     [:head [:title title]]
     [:body [:div {:id "container"}
             [:div {:id "left"} (navigation rq)]
@@ -64,13 +65,12 @@
            :get (fn [rq] (page rq "one" "I"))}]
     [:two {:path "II.:format"
            :get (fn [rq] (page rq "two" "II"))}]]
-   ;; static asset handlers...
-   [:resources (resources "public")]
-   [:files (files "resources/public")]))
+   ;; static asset handling
+   [:resources (resources "public")]))
 
 (defn wrap-route-logger [h]
   (fn [r]
-    (log/infof "Matched route: %s" (:route-context r))
+    (log/infof "Wire route context: %s" (dissoc (h/context r) :routes))
     (h r)))
 
 (def handler
