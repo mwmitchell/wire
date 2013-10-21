@@ -4,46 +4,55 @@
 
 (defn context
   "Returns the matched route context map"
-  [request]
-  (mw/match-id request))
+  ([request]
+     (mw/match-id request))
+  ([] mw/*context*))
 
-(defn root
-  "Returns the root route from the context"
-  [request]
-  (-> request context :routes (first)))
+(defmacro defhelper [name local-name args & body]
+  `(defn ~name
+     ([request# ~@args]
+        {:pre [(map? request#)]}
+        (let [~local-name (context request#)]
+          ~@body))
+     ([~@args]
+        (let [~local-name (context)]
+          ~@body))))
 
-(defn current
-  "Returns the route that matched the request"
-  [request]
-  (-> request context :routes (last)))
+;; Returns the root route from the context
+(defhelper root c []
+  (-> c :routes first))
 
-(defn parent [request]
-  (-> request context :routes butlast last))
+;; Returns the route that matched the request
+(defhelper current c []
+  (-> c :routes last))
 
-(defn depth [request]
-  (-> request context :routes count))
+(defhelper parent c []
+  (-> c :routes butlast last))
 
-(defn route-at [request depth]
-  (get (-> request context :routes) (- depth 1)))
+(defhelper depth c []
+  (-> c :routes count))
 
-(defn route-from [request inv-depth]
-  (route-at request (- (depth request) inv-depth)))
+(defhelper route-at c [depth]
+  (get (-> c :routes) (- depth 1)))
 
-(defn path [request]
-  (-> request context :path))
+(defhelper route-from c [inv-depth]
+  (let [r {mw/match-id c}]
+    (route-at r (- (depth r) inv-depth))))
 
-(defn ids [request]
-  (-> request context :ids))
+(defhelper path c []
+  (:path c))
 
-(defn method [request]
-  (-> request context :method))
+(defhelper ids c []
+  (:ids c))
 
-(defn params [request]
-  (-> request context :params))
+(defhelper method c []
+  (:method c))
 
-(defn path-for
-  "Using the root route, builds a path based on the ids vector.
-   Params is a map of values for the path params."
-  [request ids & [params]]
-  (r/route-path (root request) ids params))
+(defhelper params c []
+  (:params c))
 
+;; Using the root route, builds a path based on the ids vector.
+;; Params is a map of values for the path params.
+(defhelper path-for c [ids params]
+  (let [r {mw/match-id c}]
+    (r/route-path (root r) ids params)))
