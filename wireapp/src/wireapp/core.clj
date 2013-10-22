@@ -1,7 +1,7 @@
 (ns wireapp.core
   (:require [wire.routing :as r]
             [wire.middleware :as m]
-            [wire.helpers :as h :refer [path-for]]
+            [wire.bound-helpers :as h :refer [path-for]]
             [hiccup.core :as html]
             [hiccup.page :as page]
             [clojure.tools.logging :as log]
@@ -69,7 +69,7 @@
 
 (defn wrap-route-logger [h]
   (fn [r]
-    (log/infof "Wire route context: %s" (dissoc (m/context) :routes))
+    (log/infof "Wire route context: %s" (dissoc (m/context r) :routes))
     (h r)))
 
 (def handler
