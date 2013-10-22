@@ -34,12 +34,7 @@
   [route pred & [parents]]
   (if (pred route)
     (conj parents route)
-    (some #(collect-by % pred (conj (vec parents) %)) (children route))))
-
-(defn collect-by-id
-  "Returns a route (and ancestors) if the route-id matches"
-  [route route-id]
-  (collect-by route #(= (id %) route-id)))
+    (some #(collect-by % pred (conj (vec parents) route)) (children route))))
 
 (defn collect-each
   "Returns routes matching the path of `names`"

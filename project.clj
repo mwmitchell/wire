@@ -7,4 +7,5 @@
                  [clout "1.1.0"]
                  [ring/ring-core "1.2.0"]
                  [compojure "1.1.5"]
-                 [org.clojure/tools.logging "0.2.6"]])
+                 [org.clojure/tools.logging "0.2.6"]]
+  :profiles {:dev {:dependencies [[midje "1.5.1"]]}})
