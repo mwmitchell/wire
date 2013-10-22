@@ -8,8 +8,7 @@
 (def match-id ::context)
 
 (defn context
-  ([r] (get r match-id))
-  ([] *context*))
+  ([r] (get r match-id)))
 
 (defn wrap-exec-route
   "The last element in the middleware chain.

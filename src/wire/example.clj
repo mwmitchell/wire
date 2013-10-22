@@ -1,5 +1,5 @@
 (ns wire.example
-  (:require [wire.helpers :as h]
+  (:require [wire.bound-helpers :as h]
             [wire.routing :as r]
             [wire.middleware :as m]
             [clojure.string :as s]))

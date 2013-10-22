@@ -1,52 +1,57 @@
 (ns wire.helpers
-  (:require [wire.routing :as r]
+  (:require [wire.routing :as rt]
             [wire.middleware :as mw]))
 
-(defmacro defhelper [name local-name args & body]
-  `(defn ~name
-     ([request# ~@args]
-        {:pre [(map? request#)]}
-        (let [~local-name (mw/context request#)]
-          ~@body))
-     ([~@args]
-        (let [~local-name (mw/context)]
-          ~@body))))
+(defn- context [r] (mw/context r))
 
-;; Returns the root route from the context
-(defhelper root c []
-  (-> c :routes first))
+(defn routes [r]
+  (-> r context :routes))
 
-;; Returns the route that matched the request
-(defhelper current c []
-  (-> c :routes last))
+(defn path [r]
+  (-> r context :path ))
 
-(defhelper parent c []
-  (-> c :routes butlast last))
+(defn ids [r]
+  (-> r context :ids))
 
-(defhelper depth c []
-  (-> c :routes count))
+(defn method [r]
+  (-> r context :method))
 
-(defhelper route-at c [depth]
-  (get (-> c :routes) (- depth 1)))
+(defn params [r]
+  (-> r context :params))
 
-(defhelper route-from c [inv-depth]
-  (let [r {mw/match-id c}]
-    (route-at r (- (depth r) inv-depth))))
+(defn root
+  "Returns the root route from the context"
+  [r]
+  (first (routes r)))
 
-(defhelper path c []
-  (:path c))
+(defn current
+  "Returns the route that matched the request"
+  [r]
+  (last (routes r)))
 
-(defhelper ids c []
-  (:ids c))
+(defn parent
+  "Returns the parent of the matched route"
+  [r]
+  (-> (routes r) butlast last))
 
-(defhelper method c []
-  (:method c))
+(defn depth
+  "Returns the level of the matching route"
+  [r]
+  (count (routes r)))
 
-(defhelper params c []
-  (:params c))
+(defn route-at
+  "Returns the route at depth (1-based index)"
+  [r depth]
+  (get (routes r) (- depth 1)))
+
+(defn route-from
+  "Returns the route from the current, up inv-depth levels"
+  [r inv-depth]
+  (route-at r (- (depth r) inv-depth)))
 
 ;; Using the root route, builds a path based on the ids vector.
 ;; Params is a map of values for the path params.
-(defhelper path-for c [ids params]
-  (let [r {mw/match-id c}]
-    (r/route-path (root r) ids params)))
+(defn path-for
+  "Returns a string path using wire.routing/route-path"
+  [r ids params]
+  (rt/route-path (root r) ids params))
