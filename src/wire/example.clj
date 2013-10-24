@@ -39,9 +39,6 @@
   (-> m/wrap-exec-route
       (m/wrap-identify-route app-routes)))
 
-;; path by global id:
-(r/route-path-by app-routes #(= (r/id %) :new-location) {})
-
 ;; path by name hierarchy:
 (r/route-path app-routes [:admin :locations :location] {:id 1})
 

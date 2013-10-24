@@ -34,7 +34,7 @@
                  [:child-a-a {}]]
                 [:child-b {}
                  [:child-b-b {}]]]]
-    (collect-each routes [:child-b :child-b-b])
+    (collect-by-each-id routes [:child-b :child-b-b])
     =>
     [[:root {} [:child-a {} [:child-a-a {}]] [:child-b {} [:child-b-b {}]]]
      [:child-b {} [:child-b-b {}]]

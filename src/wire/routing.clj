@@ -17,11 +17,11 @@
 
 (defn id [[id & _]] id)
 
-(defn path [[id {p :path} & _]]
+(defn path [[rid {p :path} & _]]
   (or (when (vector? p) (first p))
       p
-      (when (string? id) id)
-      (s/join #"/" (keep #(% id) [namespace name]))))
+      (when (string? rid) rid)
+      (s/join #"/" (keep #(when rid (% rid)) [namespace name]))))
 
 (defn rules [[_ {p :path r :rules} & _]]
   (or
@@ -30,22 +30,29 @@
    {}))
 
 (defn collect-by
-  "Returns a route (and ancestors) if pred returns true."
+  "Traverses the given root node.
+   Returns a vector of routes (ancestors and matched route)
+   if pred returns true."
   [route pred & [parents]]
   (if (pred route)
     (conj parents route)
     (some #(collect-by % pred (conj (vec parents) route)) (children route))))
 
-(defn collect-each
-  "Returns routes matching the path of `names`"
-  [root names]
-  (->> names
+(defn collect-by-each-fn
+  "Returns a vector of routes matching the path of each predicate in fns"
+  [root fns]
+  (->> fns
        (reduce
-        (fn [[current mem] rname]
-          (when-let [child (->> (children current) (filter #(= rname (id %))) first)]
+        (fn [[current mem] f]
+          (when-let [child (->> (children current) (filter f) first)]
             [child (conj mem child)]))
         [root [root]])
        (last)))
+
+(defn collect-by-each-id
+  "Returns a vector of routes based on the given ids"
+  [root ids]
+  (collect-by-each-fn root (map #(fn [r] (= (id r) %)) ids)))
 
 (defn root
   "Builds a default root route w/an empty path"
@@ -73,7 +80,15 @@
    (replace-named-params p (dissoc opts :*))
    (:* opts)))
 
-(defn- make-path [route-set path-values]
+(defn make-path
+  "Accepts a vector of routes (assumed to be in path order).
+   path-values is a hash-map for path param replacement.
+   Example:
+   (make-path [[nil {}]
+                 [:fooy {:path \":param1\"}]
+                 [:bary {} []]] {:param1 \"foo\"})
+  \"/foo/bary\""
+  [route-set path-values]
   (str "/"
        (replace-params
         (->> route-set
@@ -85,8 +100,5 @@
   "Creates a param populated path suitable for use in an URL.
    Example:
    (route-path route [:sub-of-root :sub-of-sub] {:param 100})"
-  [root names path-values]
-  (make-path (collect-each root names) path-values))
-
-(defn route-path-by [route fn path-values]
-  (make-path (butlast (collect-by route fn)) path-values))
+  [root ids path-values]
+  (make-path (collect-by-each-id root ids) path-values))
