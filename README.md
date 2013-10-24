@@ -11,7 +11,7 @@ The goals of Wire are:
   * separate identification-of route and execution-of matched handler
 
 ##Examples
-There's an example app in the "/wireapp" directory, and an example.clj file in /src/wire.
+There's an example app in the [wireapp](https://github.com/mwmitchell/wire/tree/master/wireapp) directory, and an [example.clj](https://github.com/mwmitchell/wire/blob/master/src/wire/example.clj) file.
 
 ## Usage
 
@@ -20,7 +20,7 @@ There's an example app in the "/wireapp" directory, and an example.clj file in /
 ```
 
 ## Description
-The main structure that contains a route is a vector. The first element in the vector is the route's ID. This ID is an identifier used for locating the route and building paths etc..
+A vector contains the definition of a route. The first element in the vector is the route's ID. This ID is an identifier used for locating the route and building paths etc..
 
 The next element is a hash-map describing the route options; The request method handlers, the path, etc..
 
@@ -32,7 +32,7 @@ Here's a sample route definition:
 (require '[wire.routing :refer :all])
 
 (def my-routes
-  (root
+  [nil {}
    [:login {:path "login.html"
             :get show-login
             :post do-login}]
@@ -43,7 +43,7 @@ Here's a sample route definition:
      [:location {:path [":id" :id #"[0-9]+"]
                  :get show-location
                  :put update-location
-                 :delete destroy-location}]]])
+                 :delete destroy-location}]]]])
 ```
 
 ##API
@@ -70,6 +70,35 @@ If the route matches the request, a map is returned:
 
 ```clojure
 ;; TODO...
+```
+###CRUD
+Wire features a simple route builder for Rails-like CRUD apps, via `wire.crud`.
+The wire.crud/resources function accepts the singular and plural forms of the resource name,
+and a map of functions to handle the supported actions; :create,:index,:update,:destroy,:new,:show,:edit.
+
+Here's a small example, which simple uses `identity` on the request for each action handler:
+
+```clojure
+(require 'wire.compile)
+(require 'wire.routing)
+(require 'wire.crud)
+(let [handlers {:create identity
+                :index identity
+                :update identity
+                :destroy identity
+                :new identity
+                :show identity
+                :edit identity}
+      place-routes (wire.crud/resources :place :places handlers)
+      ;; Wire routes are easily composable!
+      ;; Here, we're adding /admin to each place route
+      routes (apply wire.routing/root {:path "admin"} place-routes)
+      http-request {:path-info "/admin/places/100/edit" :request-method :get}
+      match ((wire.compile/identifier routes) http-request)]
+  ((:handler match) {:path (:path match)
+                     :rules (:rules match)
+                     :params (:params match)
+                     :ids (:ids match)}))
 ```
 
 ###Middleware

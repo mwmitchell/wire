@@ -28,21 +28,3 @@
       {:path (name plural)
        :get (:index fn-mapping)
        :post (:create fn-mapping)}]]))
-
-(comment
-  (require 'wire.compile)
-  (require 'wire.routing)
-  (let [handlers {:create identity
-                  :index identity
-                  :update identity
-                  :destroy identity
-                  :new identity
-                  :show identity
-                  :edit identity}
-        place-routes (resources :place :places handlers)
-        routes (apply wire.routing/root {:path "admin"} place-routes)
-        match ((wire.compile/identifier routes) {:path-info "/admin/places/100/edit" :request-method :get})]
-    ((:handler match) {:path (:path match)
-                       :rules (:rules match)
-                       :params (:params match)
-                       :ids (:ids match)})))
