@@ -16,7 +16,7 @@ There's an example app in the "/wireapp" directory, and an example.clj file in /
 ## Usage
 
 ```clojure
-[codesignals/wire "0.3.3"]
+[codesignals/wire "0.4.1"]
 ```
 
 ## Description
